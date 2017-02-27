@@ -119,7 +119,10 @@
 	display: inline-block;
 }
 
-.ls-v5 .ls-bottom-nav-wrapper {
+.ls-v5 .ls-bottom-slidebuttons,
+.ls-v5 .ls-nav-start,
+.ls-v5 .ls-nav-stop,
+.ls-v5 .ls-nav-sides {
 	top: -30px;
 }
 

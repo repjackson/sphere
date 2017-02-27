@@ -5,18 +5,12 @@ Docs.before.insert (userId, doc)->
     doc.author_id = Meteor.userId()
     doc.points = 0
     doc.down_voters = []
-    # doc.tags.push Meteor.user().profile.current_herd
     doc.up_voters = []
     return
 
-
-# Docs.after.insert (userId, doc)->
-#     console.log doc.tags
-#     return
-
 Docs.after.update ((userId, doc, fieldNames, modifier, options) ->
     doc.tag_count = doc.tags?.length
-    # Meteor.call 'generate_authored_cloud'
+    Meteor.call 'generate_authored_cloud'
 ), fetchPrevious: true
 
 
@@ -50,7 +44,6 @@ if Meteor.isClient
     
         tag_class: -> if @valueOf() in selected_tags.array() then 'primary' else 'basic'
 
-        selected_tags: -> selected_tags.list()
 
     
     Template.view.helpers
@@ -69,19 +62,7 @@ if Meteor.isClient
         'click #add': ->
             Meteor.call 'add', (err,id)->
                 FlowRouter.go "/edit/#{id}"
-    
-        'keyup #quick_add': (e,t)->
-            e.preventDefault
-            tag = $('#quick_add').val().toLowerCase()
-            if e.which is 13
-                if tag.length > 0
-                    split_tags = tag.match(/\S+/g)
-                    $('#quick_add').val('')
-                    Meteor.call 'add', split_tags
-                    selected_tags.clear()
-                    for tag in split_tags
-                        selected_tags.push tag
-    
+
 
 
 if Meteor.isServer
@@ -95,18 +76,12 @@ if Meteor.isServer
     
     Meteor.publish 'docs', (selected_tags, filter)->
     
-        user = Meteor.users.findOne @userId
-        current_herd = user.profile.current_herd
-    
         self = @
         match = {}
-        selected_tags.push current_herd
-        match.tags = $all: selected_tags
         # if selected_tags.length > 0 then match.tags = $all: selected_tags
+        match.tags = $all: selected_tags
         if filter then match.type = filter
-
-        
-
+    
         Docs.find match,
             limit: 5
             
@@ -116,34 +91,3 @@ if Meteor.isServer
     
     
     
-    Meteor.publish 'doc_tags', (selected_tags)->
-        
-        user = Meteor.users.findOne @userId
-        current_herd = user.profile.current_herd
-        
-        self = @
-        match = {}
-        
-        selected_tags.push current_herd
-        match.tags = $all: selected_tags
-
-        
-        cloud = Docs.aggregate [
-            { $match: match }
-            { $project: tags: 1 }
-            { $unwind: "$tags" }
-            { $group: _id: '$tags', count: $sum: 1 }
-            { $match: _id: $nin: selected_tags }
-            { $sort: count: -1, _id: 1 }
-            { $limit: 20 }
-            { $project: _id: 0, name: '$_id', count: 1 }
-            ]
-        # console.log 'cloud, ', cloud
-        cloud.forEach (tag, i) ->
-            self.added 'tags', Random.id(),
-                name: tag.name
-                count: tag.count
-                index: i
-    
-        self.ready()
-        

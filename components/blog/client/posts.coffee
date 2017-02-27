@@ -13,7 +13,7 @@ Template.posts.helpers
             },
             sort:
                 publish_date: -1
-            limit: 10
+            limit: 5
             
 Template.posts.events
     'click #add_post': ->
@@ -24,21 +24,17 @@ Template.posts.events
 
 
 
-Template.post.helpers
-    tag_class: -> if @valueOf() in selected_tags.array() then 'red' else 'basic'
-
-    can_edit: -> @author_id is Meteor.userId()
 
     
 Template.post_item.helpers
-    tag_class: -> if @valueOf() in selected_tags.array() then 'red' else 'basic'
+    tag_class: -> if @valueOf() in selected_tags.array() then 'secondary' else 'basic'
 
     can_edit: -> @author_id is Meteor.userId()
 
     
 
 
-Template.post.events
+Template.post_item.events
     'click .post_tag': ->
         if @valueOf() in selected_tags.array() then selected_tags.remove @valueOf() else selected_tags.push @valueOf()
 

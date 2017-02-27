@@ -9,11 +9,8 @@ Template.edit_tags.events
                 $('#add_tag').val('')
 
     'click .doc_tag': (e,t)->
+        organization = Docs.findOne FlowRouter.getParam('doc_id')
         tag = @valueOf()
         Docs.update FlowRouter.getParam('doc_id'),
             $pull: tags: tag
         $('#add_tag').val(tag)
-
-Template.edit_tags.helpers
-    # doc_tag_class: ->
-    #     if @valueOf() is Meteor.user().profile.current_herd then 'disabled' else ''

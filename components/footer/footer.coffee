@@ -1,4 +1,16 @@
 if Meteor.isClient
+    
+    Template.footer.helpers
+        footer: Docs.find()
+    
+    
+    
+    # Template.footer.onCreated ->
+    #     self = @
+    #     self.autorun ->
+    #         self.subscribe 'featured_events'
+    
+    
     Template.footer.events
         'click #submit_contact_form': ->
             if $("#cancel").prop('checked')
@@ -19,7 +31,7 @@ if Meteor.isClient
             #get the captcha data
             # captchaData = grecaptcha.getResponse()
             
-            Modules.insert
+            Docs.insert
                 type: 'submission'
                 data: form_data
             , ->
@@ -44,7 +56,7 @@ if Meteor.isClient
             #         console.log 'There was an error: ' + error.reason
             #     else
             #         console.log 'Success!'
-            #         Modules.insert
+            #         Docs.insert
             #             type: 'submission'
             #             data: form_data
             #         , ->
